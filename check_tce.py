@@ -1,26 +1,33 @@
 
 import urllib.request
 import urllib.error
+import http.client
 
-url = "https://tce.by/"
+url = (
+    "https://tce.by/shows.html"
+    "?base=RkZDMTE2MUQtMTNFNy00NUIyLTg0QzYtMURDMjRBNTc1ODA0"
+    "&data=5265"
+)
 
 request = urllib.request.Request(
     url,
-    headers={
-        "User-Agent": "MinskTheatreBot/0.1 (availability research)"
-    }
+    headers={"User-Agent": "MinskTheatreBot/0.1"}
 )
 
 try:
     with urllib.request.urlopen(request, timeout=15) as response:
         print("HTTP status:", response.status)
-        print("Final URL:", response.geturl())
         print("Content type:", response.headers.get("Content-Type"))
-        print("Access test completed")
+        print("Page received:", len(response.read()), "bytes")
 
 except urllib.error.HTTPError as error:
     print("HTTP status:", error.code)
-    print("Server refused or restricted the request")
 
-except urllib.error.URLError as error:
-    print("Connection error:", error.reason)
+except (
+    urllib.error.URLError,
+    http.client.RemoteDisconnected,
+    TimeoutError,
+    ConnectionError
+) as error:
+    print("Connection failed:", type(error).__name__)
+    print("Details:", str(error))
