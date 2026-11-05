@@ -3,6 +3,7 @@ import os
 import re
 import json
 import urllib.request
+import urllib.parse
 from html.parser import HTMLParser
 from pathlib import Path
 
