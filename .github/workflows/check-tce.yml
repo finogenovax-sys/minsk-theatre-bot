@@ -1,0 +1,19 @@
+
+name: Check TCE Access
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: Get project files
+        uses: actions/checkout@v4
+
+      - name: Check TCE website
+        run: python check_tce.py
