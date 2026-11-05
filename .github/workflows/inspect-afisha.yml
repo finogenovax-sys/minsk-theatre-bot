@@ -1,0 +1,20 @@
+
+name: Inspect Theatre Afisha
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+
+    steps:
+      - name: Get project files
+        uses: actions/checkout@v4
+
+      - name: Inspect afisha content
+        run: python inspect_afisha.py
