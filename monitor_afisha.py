@@ -7,7 +7,7 @@ import urllib.parse
 from html.parser import HTMLParser
 from pathlib import Path
 
-URL = "https://puppet-minsk.by/bilety/afisha"
+URL = "https://puppet-minsk.by/afisha"
 STATE_FILE = Path("afisha_state.json")
 
 DATE_RE = re.compile(
