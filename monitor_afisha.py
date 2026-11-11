@@ -121,7 +121,7 @@ def get_events():
                 break
 
             if title and title.casefold() in adult_titles:
-            events.add(f"{date} | {title}")
+                events.add(f"{date} | {title}")
 
     return sorted(events)
 
