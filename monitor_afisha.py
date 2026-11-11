@@ -78,7 +78,7 @@ def get_adult_titles():
 
 
 def get_events():
-            adult_titles = get_adult_titles()
+    adult_titles = get_adult_titles()
     request = urllib.request.Request(
         URL,
         headers={"User-Agent": "Mozilla/5.0"}
