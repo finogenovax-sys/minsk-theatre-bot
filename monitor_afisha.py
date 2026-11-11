@@ -39,7 +39,7 @@ class AfishaParser(HTMLParser):
 def get_events():
     request = urllib.request.Request(
         URL,
-        headers={"User-Agent": "MinskTheatreBot/0.1"}
+       headers={"User-Agent": "Mozilla/5.0"}
     )
 
     with urllib.request.urlopen(
