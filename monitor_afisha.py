@@ -101,6 +101,8 @@ def get_events():
 
     events = set()
     texts = parser.text
+    print("ВСЕГО ЭЛЕМЕНТОВ:", len(texts))
+    print("ПЕРВЫЕ 100 ЭЛЕМЕНТОВ:", repr(texts[:100]))
 
     for i, value in enumerate(texts):
         if not date_pattern.match(value):
