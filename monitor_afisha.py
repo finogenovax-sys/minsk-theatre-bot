@@ -90,47 +90,48 @@ def get_events():
     parser = AfishaParser()
     parser.feed(html)
 
+    
     months = (
         "января|февраля|марта|апреля|мая|июня|"
         "июля|августа|сентября|октября|ноября|декабря"
     )
+
     date_pattern = re.compile(
-        rf"^\d{{1,2}}\s+({months})\b",
+        rf"^\d{{1,2}}\s+({months})(?:\b|,)",
         re.IGNORECASE
     )
 
+    def normalize(text):
+        return " ".join(text.casefold().replace("ё", "е").split())
+
+    adult_normalized = {
+        normalize(title): title for title in adult_titles
+    }
+
     events = set()
     texts = parser.text
-    print("ВСЕГО ЭЛЕМЕНТОВ:", len(texts))
-    print("ПЕРВЫЕ 100 ЭЛЕМЕНТОВ:", repr(texts[:100]))
 
     for i, value in enumerate(texts):
         if not date_pattern.match(value):
             continue
 
         date = value
-        title = ""
 
-        for candidate in texts[i + 1:i + 7]:
+        for candidate in texts[i + 1:i + 15]:
             if date_pattern.match(candidate):
                 break
-            if candidate.lower() in ("купить билет", "билеты"):
-                continue
-            if re.fullmatch(r"\d{1,2}:\d{2}", candidate):
-                continue
-            if len(candidate) > 2:
-                title = candidate
-                break
-            if title:
-                print("АФИША:", repr(title))
-                print("ЕСТЬ В СПИСКЕ ВЗРОСЛЫХ:",
-                      title.casefold() in adult_titles)
 
-            if title and title.casefold() in adult_titles:
+            normalized = normalize(candidate)
+
+            if normalized in adult_normalized:
+                title = adult_normalized[normalized]
                 events.add(f"{date} | {title}")
+                break
 
     print("ВЗРОСЛЫЕ СПЕКТАКЛИ:", sorted(adult_titles))
     print("НАЙДЕНО СОБЫТИЙ:", len(events))
+    print("СОБЫТИЯ:", sorted(events))
+
     return sorted(events)
 
 def send_telegram(message):
