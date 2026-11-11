@@ -36,34 +36,53 @@ class AfishaParser(HTMLParser):
                 self.text.append(value)
 
 
+
 def get_events():
     request = urllib.request.Request(
         URL,
-       headers={"User-Agent": "Mozilla/5.0"}
+        headers={"User-Agent": "Mozilla/5.0"}
     )
 
-    with urllib.request.urlopen(
-        request, timeout=20
-    ) as response:
-        html = response.read().decode(
-            "utf-8", errors="replace"
-        )
+    with urllib.request.urlopen(request, timeout=20) as response:
+        html = response.read().decode("utf-8", errors="replace")
 
     parser = AfishaParser()
     parser.feed(html)
 
+    months = (
+        "января|февраля|марта|апреля|мая|июня|"
+        "июля|августа|сентября|октября|ноября|декабря"
+    )
+    date_pattern = re.compile(
+        rf"^\d{{1,2}}\s+({months})\b",
+        re.IGNORECASE
+    )
+
     events = set()
+    texts = parser.text
 
-    for i, text in enumerate(parser.text[:-1]):
-        if DATE_RE.fullmatch(text):
-            title = parser.text[i + 1]
+    for i, value in enumerate(texts):
+        if not date_pattern.match(value):
+            continue
 
-            if not DATE_RE.fullmatch(title):
-                if len(title) < 150:
-                    events.add(f"{text} | {title}")
+        date = value
+        title = ""
+
+        for candidate in texts[i + 1:i + 7]:
+            if date_pattern.match(candidate):
+                break
+            if candidate.lower() in ("купить билет", "билеты"):
+                continue
+            if re.fullmatch(r"\d{1,2}:\d{2}", candidate):
+                continue
+            if len(candidate) > 2:
+                title = candidate
+                break
+
+        if title:
+            events.add(f"{date} | {title}")
 
     return sorted(events)
-
 
 def send_telegram(message):
     token = os.environ["TELEGRAM_BOT_TOKEN"]
