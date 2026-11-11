@@ -119,10 +119,16 @@ def get_events():
             if len(candidate) > 2:
                 title = candidate
                 break
+            if title:
+                print("АФИША:", repr(title))
+                print("ЕСТЬ В СПИСКЕ ВЗРОСЛЫХ:",
+                      title.casefold() in adult_titles)
 
             if title and title.casefold() in adult_titles:
                 events.add(f"{date} | {title}")
 
+    print("ВЗРОСЛЫЕ СПЕКТАКЛИ:", sorted(adult_titles))
+    print("НАЙДЕНО СОБЫТИЙ:", len(events))
     return sorted(events)
 
 def send_telegram(message):
