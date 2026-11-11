@@ -8,6 +8,7 @@ from html.parser import HTMLParser
 from pathlib import Path
 
 URL = "https://puppet-minsk.by/afisha"
+ADULT_URL = "https://puppet-minsk.by/spektakli/spektakli-dlya-vzroslykh"
 STATE_FILE = Path("afisha_state.json")
 
 DATE_RE = re.compile(
@@ -37,7 +38,47 @@ class AfishaParser(HTMLParser):
 
 
 
+
+class AdultParser(HTMLParser):
+    def __init__(self):
+        super().__init__()
+        self.in_title = False
+        self.titles = set()
+
+    def handle_starttag(self, tag, attrs):
+        if tag == "p":
+            classes = dict(attrs).get("class", "").split()
+            if "spectacli-title" in classes:
+                self.in_title = True
+
+    def handle_endtag(self, tag):
+        if tag == "p":
+            self.in_title = False
+
+    def handle_data(self, data):
+        if self.in_title and data.strip():
+            self.titles.add(" ".join(data.split()).casefold())
+
+
+def get_adult_titles():
+    request = urllib.request.Request(
+        ADULT_URL,
+        headers={"User-Agent": "Mozilla/5.0"}
+    )
+    with urllib.request.urlopen(request, timeout=20) as response:
+        html = response.read().decode("utf-8", errors="replace")
+
+    parser = AdultParser()
+    parser.feed(html)
+
+    if not parser.titles:
+        raise RuntimeError("Adult performances not found")
+
+    return parser.titles
+
+
 def get_events():
+            adult_titles = get_adult_titles()
     request = urllib.request.Request(
         URL,
         headers={"User-Agent": "Mozilla/5.0"}
@@ -79,7 +120,7 @@ def get_events():
                 title = candidate
                 break
 
-        if title:
+            if title and title.casefold() in adult_titles:
             events.add(f"{date} | {title}")
 
     return sorted(events)
