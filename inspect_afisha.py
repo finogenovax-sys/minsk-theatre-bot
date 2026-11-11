@@ -3,7 +3,7 @@ import re
 import urllib.request
 from html.parser import HTMLParser
 
-URL = "https://puppet-minsk.by/bilety/afisha"
+URL = "https://puppet-minsk.by/afisha"
 
 class PageInspector(HTMLParser):
     def __init__(self):
